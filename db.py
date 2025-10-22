@@ -1,8 +1,12 @@
 from fastapi import FastAPI
-from sqlmodel import SQLModel, Field
+from sqlmodel import SQLModel, Field, create_engine, Session
 from uuid import UUID, uuid4
 from datetime import datetime, timezone
 from enum import Enum
+
+engine = create_engine("sqlite:///todo_API.db")
+
+SQLModel.metadata.create_all(engine)
 
 class Status(Enum):
     todo = "todo"

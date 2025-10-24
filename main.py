@@ -1,39 +1,27 @@
-from fastapi import FastAPI, Depends
-from sqlmodel import SQLModel, Field, create_engine, Session, select
-from .db import Status, Todo, engine
+from flask import Flask, render_template, redirect, url_for, request, session
+from db import Status, Todo, db
 from datetime import datetime, timezone
+from typing import Optional
+from sqlalchemy import and_, func
 
-app = FastAPI()
+# app setup
+app = Flask(__name__)
+app.config["SECRET_KEY"] = "secretkey"
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///todo.db"
 
-def get_session():
-    with Session(engine) as session:
-        yield session
+# initialize sqlalchemy
+db.init_app(app)
 
-@app.on_event("startup")
-def on_startup():
-    SQLModel.metadata.create_all(engine)
+# create new database every start, this is only for testing purposes
+with app.app_context():
+    db.drop_all()
+    db.create_all()
 
-@app.post("/todos")
-def add_todo(name: str, due_date: datetime, status: Status):
-    with Session(engine) as session:
-        todo = Todo(
-            name=name,
-            due_date=due_date,
-            status=status
-        )
-        session.add(todo)
-        session.commit()
-        session.refresh(todo)
-        print(todo)
-
-
-@app.get("/todos")
-def list_todos(session: Session = Depends(get_session)):
-    with Session(engine) as session:
-        # get all todos
-        return session.exec(select(Todo)).all()
+# routes
+@app.route("/", methods=["GET", "POST"])
+def home():
+    return render_template("index.html")
     
-
-@app.get("/")
-def root():
-    return {"status": "ok", "service": "todo-api"}
+@app.get("/health")
+def health():
+    return {"status": "ok"}

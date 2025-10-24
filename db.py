@@ -1,23 +1,20 @@
-from fastapi import FastAPI
-from sqlmodel import SQLModel, Field, create_engine, Session
+from flask_sqlalchemy import SQLAlchemy
 from uuid import UUID, uuid4
 from datetime import datetime, timezone
 from enum import Enum
 
-engine = create_engine("sqlite:///todo_API.db")
-
-SQLModel.metadata.create_all(engine)
+db = SQLAlchemy()
 
 class Status(Enum):
     todo = "todo"
     doing = "doing"
     done = "done"
 
-class Todo(SQLModel, table=True):
-    id: UUID = Field(default_factory=uuid4, primary_key=True)
-    name: str = Field(nullable=False, max_length=30) 
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), nullable=False)
-    due_date: datetime | None = None
-    status: Status = Field(default=Status.todo)
-
+class Todo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(40))
+    description = db.Column(db.String(200))
+    created_at = db.Column(db.String(40))
+    due_date = db.Column(db.String(40))
+    status = db.Column(db.String(40))
 

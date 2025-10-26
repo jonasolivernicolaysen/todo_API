@@ -18,3 +18,15 @@ class Todo(db.Model):
     due_date = db.Column(db.String(40))
     status = db.Column(db.String(40))
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "created_at": self.created_at,
+            "due_date": self.due_date,
+            "status": self.status,
+        }
+
+    def __repr__(self) -> str:
+        return f"<Todo: {self.id, self.name, self.description, self.created_at, self.due_date, self.status}>"

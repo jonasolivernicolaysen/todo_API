@@ -2,20 +2,24 @@
 
 {%block title%} Todo API {%endblock%}
 
+{%if error%}
+<div> {{ error }} </div>
+{%endif%}
+
 {%block content%}
 <div id="todo_form" name="todo_form">
-    <form>
+    <form action="/create_todo" method="post">
         <div class="form-group">
             <label for="name">Name</label>
-            <input type="text" class="form-control" id="form_name" placeholder="Write the name of your todo here">
+            <input type="text" class="form-control" id="form_name" name="form_name" placeholder="Write the name of your todo here">
         </div>
         <div class="form-group">
             <label for="description">Description</label>
-            <input type="text" class="form-control" id="form_description" placeholder="Write your description here">
+            <input type="text" class="form-control" id="form_description" name="form_description" placeholder="Write your description here">
         </div>
         <div class="form-group">
             <label for="due_date">Due date</label>
-            <input type="text" class="form-control" id="form_due_date" placeholder="Write your due date here">
+            <input type="datetime-local" class="form-control" id="form_due_date" name="form_due_date" placeholder="Write your due date here">
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>

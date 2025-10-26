@@ -1,0 +1,22 @@
+{%extends "base.html"%}
+
+{%block title%} Home {%endblock%}
+
+{%if error%}
+<div> {{ error }} </div>
+{%endif%}
+
+{%block content%}
+<div id="homepage" name="homepage">
+    <p>HOME</p>
+    <button id="create_todo_button" name="create_todo_button">create todo page</button>
+    <button id="get_todos_button" name="get_todos_button">get todos</button>
+</div>
+
+<script>
+document.getElementById("create_todo_button").onclick = function() {
+    location.href = "http://127.0.0.1:5000/create_todo"
+}
+
+</script>
+{%endblock%}

@@ -1,5 +1,5 @@
 from flask import Flask, render_template, redirect, url_for, request, session
-from db import Status, Todo, db
+from db import Status, Todo, User, db
 from datetime import datetime
 from typing import Optional
 from sqlalchemy import and_, func
@@ -24,11 +24,35 @@ def home():
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    return ""
+    session.clear()
+
+    username = request.form.get("username")
+    password = request.form.get("password")
+    password_check = request.form.get("password_check")
+
+    if password != password_check:
+        return render_template("/register.html", error="Passwords must match")
+    
+    new_user = User()
+    new_user.username = username
+    new_user.password = password
+    
+    db.session.add(new_user)
+    db.session.commit()
+    return render_template("/register.html")
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    return ""
+    username = request.form.get("username")
+    password = request.form.get("password")
+
+    # check if user is in the db, if not give an error
+    user = User.query.filter_by(username=username, password=password)
+    if user is None:
+        return render_template("/login.html", error="User not found")
+
+    return render_template("/login.html")
 
 @app.route("/create_todo", methods=["GET", "POST"])
 def create_todo():

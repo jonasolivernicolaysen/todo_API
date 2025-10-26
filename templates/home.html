@@ -11,6 +11,8 @@
     <p>HOME</p>
     <button id="create_todo_button" name="create_todo_button">create todo page</button>
     <button id="get_todos_button" name="get_todos_button">get todos</button>
+    <button id="register_button" name="register_button">register</button>
+    <button id="login_button" name="login_button">login</button>
 </div>
 
 <script>
@@ -20,6 +22,14 @@ document.getElementById("create_todo_button").onclick = function() {
 
 document.getElementById("get_todos_button").onclick = function() {
     location.href = "http://127.0.0.1:5000/todos"
+}
+
+document.getElementById("register_button").onclick = function() {
+    location.href = "http://127.0.0.1:5000/register"
+}
+
+document.getElementById("login_button").onclick = function() {
+    location.href = "http://127.0.0.1:5000/login"
 }
 
 </script>

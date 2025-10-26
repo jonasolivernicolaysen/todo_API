@@ -10,6 +10,15 @@ class Status(Enum):
     doing = "doing"
     done = "done"
 
+
+class Member(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50))
+
+    def __repr__(self) -> str:
+        return f"<User id: {self.id}, Name: {self.username}"
+
+
 class Todo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(40))

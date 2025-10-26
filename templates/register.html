@@ -1,0 +1,27 @@
+{%extends "base.html"%}
+
+{%block title%} Register {%endblock%}
+
+{%if error%}
+<div> {{ error }} </div>
+{%endif%}
+
+{%block content%}
+<div id="register_form" name="register_form">
+    <form action="/register" method="post">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" class="form-control" id="username" name="username" placeholder="Write your username here">
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="text" class="form-control" id="password" name="password" placeholder="Write your password here">
+        </div>
+        <div class="form-group">
+            <label for="password_check">Due date</label>
+            <input type="date" class="form-control" id="password_check" name="password_check" placeholder="Repeat password">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+{%endblock%}

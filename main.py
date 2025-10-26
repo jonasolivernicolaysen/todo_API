@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, request, session
 from db import Status, Todo, db
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Optional
 from sqlalchemy import and_, func
 
@@ -22,6 +22,13 @@ with app.app_context():
 def home():
     return render_template("home.html")
 
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    return ""
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    return ""
 
 @app.route("/create_todo", methods=["GET", "POST"])
 def create_todo():
@@ -30,7 +37,7 @@ def create_todo():
     name = request.form.get("form_name") 
     description = request.form.get("form_description")
     due_date = request.form.get("form_due_date")
-    created_at = datetime.now().strftime("%I:%M:%S %p").lstrip("0")
+    created_at = datetime.now().strftime("%Y-%m-%d")
 
     if not name:
         return render_template("create_todo.html", error="Name is required")

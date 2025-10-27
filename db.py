@@ -16,6 +16,12 @@ class User(db.Model):
     username = db.Column(db.String(50))
     password = db.Column(db.String(50))
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "username": self.username
+        }
+
     def __repr__(self) -> str:
         return f"<User id: {self.id}, Name: {self.username}"
 

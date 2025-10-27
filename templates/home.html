@@ -2,11 +2,13 @@
 
 {%block title%} Home {%endblock%}
 
-{%if error%}
-<div> {{ error }} </div>
-{%endif%}
 
 {%block content%}
+
+{%if error%}
+<div class="alert alert-danger text-center mb-3" role="alert" id="error">{{ error }}</div>
+{%endif%}
+
 <div id="homepage" name="homepage">
     <p>HOME</p>
     <button id="create_todo_button" name="create_todo_button">create todo page</button>

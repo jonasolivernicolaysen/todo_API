@@ -2,11 +2,14 @@
 
 {%block title%} Create todo {%endblock%}
 
-{%if error%}
-<div> {{ error }} </div>
-{%endif%}
+
 
 {%block content%}
+
+{%if error%}
+<div class="alert alert-danger text-center mb-3" role="alert" id="error">{{ error }}</div>
+{%endif%}
+
 <div id="todo_form" name="todo_form">
     <form action="/create_todo" method="post">
         <div class="form-group">

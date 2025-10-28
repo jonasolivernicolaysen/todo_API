@@ -20,9 +20,12 @@ with app.app_context():
     db.create_all()
 
 # routes
+# i need to retrieve all the todos from the db, then pass all of them through a js function to visualize in the div
 @app.route("/", methods=["GET", "POST"])
 def home():
-    return render_template("home.html")
+    todos = Todo.query.all()
+    jsonified_todos = [todo.to_dict() for todo in todos]
+    return render_template("home.html", todos=jsonified_todos)
 
 @app.route("/register", methods=["GET", "POST"])
 def register():

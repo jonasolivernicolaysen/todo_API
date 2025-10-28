@@ -11,28 +11,61 @@
 
 <div id="homepage" name="homepage">
     <p>HOME</p>
-    <button id="create_todo_button" name="create_todo_button">create todo page</button>
+    <button id="create_todo_button" name="create_todo_button">create todo</button>
     <button id="get_todos_button" name="get_todos_button">get todos</button>
     <button id="register_button" name="register_button">register</button>
     <button id="login_button" name="login_button">login</button>
 </div>
 
+{%if todos%}
+<div id="todos_div" name="todos_div">
+
+</div>
+{%endif%}
+
 <script>
+const todos = {{ todos | tojson }};
+console.log(todos)
+
+const todoList = document.getElementById("todos_div");
+todos.forEach(todo => {
+    var content =
+            `<div class="mb-2">
+                <div class="d-inline-block p-2 rounded" style="max-width: 75%;">
+                    <p class="mb-1">${todo.name} </p>
+                    <p class="mb-1">${todo.description}</p>
+                    <small class="text-muted">${todo.due_date}</small>
+                </div>
+            </div>`;
+    todoList.innerHTML += content;
+});
+
+const createTodo = (todo) => {
+    var content =
+            `<div class="mb-2">
+                <div class="d-inline-block p-2 rounded" style="max-width: 75%;">
+                    <p class="mb-1">${todo.name}</p>
+                    <p class="mb-1">${todo.description}</p>
+                    <small class="text-muted">${due_date}</small>
+                </div>
+            </div>`;
+};
+
 document.getElementById("create_todo_button").onclick = function() {
     location.href = "http://127.0.0.1:5000/create_todo"
-}
+};
 
 document.getElementById("get_todos_button").onclick = function() {
     location.href = "http://127.0.0.1:5000/todos"
-}
+};
 
 document.getElementById("register_button").onclick = function() {
     location.href = "http://127.0.0.1:5000/register"
-}
+};
 
 document.getElementById("login_button").onclick = function() {
     location.href = "http://127.0.0.1:5000/login"
-}
+};
 
 </script>
 {%endblock%}

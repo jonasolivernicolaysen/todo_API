@@ -18,7 +18,17 @@
             <label for="password">Password</label>
             <input type="password" class="form-control" id="password" name="password" placeholder="Write your password here">
         </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary">Log in</button> 
     </form>
+
+    <div class="login_register">
+        <span class="text">Don't have an account? <a id="login_register_link" class="text signup-link">Register</a></span>
+    </div>
 </div>
+
+<script>
+    document.getElementById("login_register_link").onclick = function() {
+    location.href = "http://127.0.0.1:5000/register"
+};
+</script>
 {%endblock%}

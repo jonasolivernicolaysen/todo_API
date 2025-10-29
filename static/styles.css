@@ -1,0 +1,10 @@
+.todo-description {
+  max-height: 120px;
+}
+
+.todos-div {
+  display: flex;             /* puts children side by side */
+  flex-wrap: wrap;           /* wraps to next line if too many */
+  gap: 1rem;                 /* spacing between cards */
+  justify-content: flex-start; /* or center */
+}

@@ -1,0 +1,35 @@
+{%extends "base.html"%}
+
+{%block title%} Authenticate {%endblock%}
+
+
+{%block content%}
+
+{%if error%}
+<div class="alert alert-danger text-center mb-3" role="alert" id="error">{{ error }}</div>
+{%endif%}
+
+<div id="homepage" name="homepage">
+    <p>authenticate</p>
+    <button id="authenticate_register_button" name="authenticate_register_button">register</button>
+    <button id="authenticate_login_button" name="authenticate_login_button">login</button>
+</div>
+
+{%if todos%}
+<div id="todos_div" name="todos_div"></div>
+{%endif%}
+
+<script>
+
+
+
+document.getElementById("authenticate_register_button").onclick = function() {
+    location.href = "http://127.0.0.1:5000/register"
+};
+
+document.getElementById("authenticate_login_button").onclick = function() {
+    location.href = "http://127.0.0.1:5000/login"
+};
+
+</script>
+{%endblock%}

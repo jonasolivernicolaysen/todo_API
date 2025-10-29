@@ -13,14 +13,11 @@
     <p>HOME</p>
     <button id="create_todo_button" name="create_todo_button">create todo</button>
     <button id="get_todos_button" name="get_todos_button">get todos</button>
-    <button id="register_button" name="register_button">register</button>
-    <button id="login_button" name="login_button">login</button>
+    <button id="logout_button" name="logout_button">log out</button>
 </div>
 
 {%if todos%}
-<div id="todos_div" name="todos_div">
-
-</div>
+<div id="todos_div" name="todos_div" class="todos_div d-flex flex-wrap gap-3"></div>
 {%endif%}
 
 <script>
@@ -30,26 +27,19 @@ console.log(todos)
 const todoList = document.getElementById("todos_div");
 todos.forEach(todo => {
     var content =
-            `<div class="mb-2">
-                <div class="d-inline-block p-2 rounded" style="max-width: 75%;">
-                    <p class="mb-1">${todo.name} </p>
-                    <p class="mb-1">${todo.description}</p>
-                    <small class="text-muted">${todo.due_date}</small>
+            `<div class="card shadow-sm mb-3 border-0" style="height: 200px; width: 200px">
+               <div class="card-body py-2">
+                <h6 class="card-title mb-1 fw-semibold text-truncate text-center p-2">${todo.name}</h6>
+                <p class="card-text text-muted small mb-2 todo-description overflow-auto">${todo.description}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <small class="text-secondary">Due: ${todo.due_date}</small>
+                  <span class="badge bg-primary">${todo.status || "todo"}</span>
                 </div>
+              </div>
             </div>`;
     todoList.innerHTML += content;
 });
 
-const createTodo = (todo) => {
-    var content =
-            `<div class="mb-2">
-                <div class="d-inline-block p-2 rounded" style="max-width: 75%;">
-                    <p class="mb-1">${todo.name}</p>
-                    <p class="mb-1">${todo.description}</p>
-                    <small class="text-muted">${due_date}</small>
-                </div>
-            </div>`;
-};
 
 document.getElementById("create_todo_button").onclick = function() {
     location.href = "http://127.0.0.1:5000/create_todo"
@@ -59,12 +49,8 @@ document.getElementById("get_todos_button").onclick = function() {
     location.href = "http://127.0.0.1:5000/todos"
 };
 
-document.getElementById("register_button").onclick = function() {
-    location.href = "http://127.0.0.1:5000/register"
-};
-
-document.getElementById("login_button").onclick = function() {
-    location.href = "http://127.0.0.1:5000/login"
+document.getElementById("logout_button").onclick = function() {
+    location.href = "http://127.0.0.1:5000/logout"
 };
 
 </script>

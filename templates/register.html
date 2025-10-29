@@ -22,7 +22,17 @@
             <label for="password_check">Repeat password</label>
             <input type="password" class="form-control" id="password_check" name="password_check" placeholder="Repeat password">
         </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary">Register</button>
     </form>
+
+    <div class="register_login">
+        <span class="text">Already have an account? <a id="register_login_link" class="text signup-link">Log in</a></span>
+    </div>
 </div>
+
+<script>
+    document.getElementById("register_login_link").onclick = function() {
+    location.href = "http://127.0.0.1:5000/login"
+};
+</script>
 {%endblock%}

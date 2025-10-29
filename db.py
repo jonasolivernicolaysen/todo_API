@@ -1,20 +1,13 @@
 from flask_sqlalchemy import SQLAlchemy
 from uuid import UUID, uuid4
 from datetime import datetime, timezone
-from enum import Enum
 
 db = SQLAlchemy()
 
-class Status(Enum):
-    todo = "todo"
-    doing = "doing"
-    done = "done"
-
-
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50))
-    password = db.Column(db.String(50))
+    username = db.Column(db.String(50), nullable=False)
+    password = db.Column(db.String(50), nullable=False)
 
     def to_dict(self):
         return {
@@ -22,15 +15,13 @@ class User(db.Model):
             "username": self.username
         }
 
-    def __repr__(self) -> str:
-        return f"<User id: {self.id}, Name: {self.username}"
-
 
 class Todo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(40))
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    name = db.Column(db.String(40), nullable=False)
     description = db.Column(db.String(200))
-    created_at = db.Column(db.String(40))
+    created_at = db.Column(db.String(40), nullable=False)
     due_date = db.Column(db.String(40))
     status = db.Column(db.String(40))
 
@@ -44,5 +35,3 @@ class Todo(db.Model):
             "status": self.status,
         }
 
-    def __repr__(self) -> str:
-        return f"<Todo: {self.id, self.name, self.description, self.created_at, self.due_date, self.status}>"

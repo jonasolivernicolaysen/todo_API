@@ -8,7 +8,8 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 
 # app setup
 app = Flask(__name__)
-app.config["JWT_SECRET_KEY"] = "secretkey"
+app.config["SECRET_KEY"] = "secretkey"
+app.config["JWT_SECRET_KEY"] = "jwtsecretkey"
 app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
 app.config["JWT_COOKIE_CSRF_PROTECT"] = False
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///todo.db"
@@ -33,9 +34,12 @@ def authenticate():
 @app.route("/home", methods=["GET", "POST"])
 @jwt_required()
 def home():
-    todos = Todo.query.all()
+    username = session.get("username")
+    # only show todos of the current user
+    current_user = get_jwt_identity() # gets user_id from JWT
+    todos = Todo.query.filter_by(user_id=current_user) 
     jsonified_todos = [todo.to_dict() for todo in todos]
-    return render_template("home.html", todos=jsonified_todos)
+    return render_template("home.html", todos=jsonified_todos, username=username)
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -70,6 +74,8 @@ def login():
     
     username = request.form.get("username")
     password = request.form.get("password")
+
+    session["username"] = username
 
     # check if user is in the db, if not give an error
     user = User.query.filter_by(username=username, password=password).first()
@@ -116,15 +122,3 @@ def create_todo():
     db.session.add(new_todo)
     db.session.commit()
     return redirect(url_for("home"))
-
-
-@app.route("/todos", methods=["GET"])
-def get_todos():
-    todos = Todo.query.all()
-    return {"todos": [t.to_dict() for t in todos]}
-
-
-@app.route("/users", methods=["GET"])
-def get_users():
-    users = User.query.all()
-    return {"todos": [t.to_dict() for t in users]}

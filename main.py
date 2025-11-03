@@ -110,7 +110,8 @@ def create_todo():
 
     if not name:
         return render_template("create_todo.html", error="Name is required")
-        
+    
+    # now status is always todo, must add logic to actually change this
     new_todo = Todo()
     new_todo.user_id = current_user_id
     new_todo.name = name

@@ -70,17 +70,22 @@ document.getElementById("logout_button").onclick = function() {
     location.href = "http://127.0.0.1:5000/logout"
 };
 
-todoList.addEventListener("click", (event) => {
-    const todo_card = event.target.closest(".card");
-    if (!todo_card) return;
+function closeOpenPanels(exceptBody = null) {
+    document.querySelectorAll("#todos_div .card-body.edit-mode").forEach(body => {
+        if (body === exceptBody) return;
+        if (body.dataset.original) {
+            body.innerHTML = body.dataset.original;
+            delete body.dataset.original;
+        }
+        body.classList.remove("edit-mode");
+    })
+}; 
 
-    card_body = todo_card.querySelector(".card-body");
-    if (card_body.classList.contains("edit-mode")) return;
+function openPanel(body) {
+    body.dataset.original = body.innerHTML;
+    body.classList.add("edit-mode");
 
-    card_body.dataset.original = card_body.innerHTML;
-    card_body.classList.add("edit-mode");
-
-    card_body.innerHTML = 
+    body.innerHTML = 
     `<div class="d-flex flex-column justify-content-center align-items-center h-100">
       <div class="btn-group btn-group-sm w-75" role="group">
         <button class="btn btn-outline-primary">Edit</button>
@@ -89,15 +94,50 @@ todoList.addEventListener("click", (event) => {
       </div>
       <button class="btn btn-link mt-2 cancel-edit">Cancel</button>
     </div>`;
+};
+
+todoList.addEventListener("click", (event) => {
+    const card = event.target.closest(".card");
+    if (!card) return;
+
+    // let the cancel button handler close the panel instead
+    if (event.target.classList.contains("cancel-edit")) return;
+
+    // stops card from immediately getting reverted to original again
+    event.stopPropagation();
+
+    const body = card.querySelector(".card-body");
+    if (body.classList.contains("edit-mode")) return;
+
+    closeOpenPanels(body);
+    openPanel(body);
 });
 
+// eventlistener for the cancel-edit button inside the edit-card panel
 document.addEventListener("click", (event) => {
     if (event.target.classList.contains("cancel-edit")) {
-        event.stopPropagation();
-        const card_body = event.target.closest(".card-body");
-        card_body.innerHTML = card_body.dataset.original;
-        card_body.classList.remove("edit-mode");
-    }
+        event.stopPropagation()
+        
+        // resets the body to the original content
+        const body = event.target.closest(".card-body");
+        body.innerHTML = body.dataset.original;
+
+        body.classList.remove("edit-mode");
+        delete body.dataset.original;
+    };
+});
+
+// when clicking outside a card it closes the currently open card
+// this only works combined while stoppropagation() is in todolist.addeventlistener   
+document.addEventListener("click", (event) => {
+    if (event.target.classList.contains(".card-body")) return;
+    document.querySelectorAll("#todos_div .card-body").forEach(body => {
+        if (body.dataset.original) {
+            body.innerHTML = body.dataset.original;
+            delete body.dataset.original;
+        }
+        body.classList.remove("edit-mode");
+    });
 });
 </script>
 {%endblock%}

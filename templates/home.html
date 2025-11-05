@@ -35,10 +35,11 @@ function formatDate(dateStr) {
   if (isNaN(date.getTime())) {
     return dateStr; 
   }
-
+  // returns the dates in dd/mm/yy format
   return date.toLocaleDateString("en-GB");
 }
 
+// loads todos from the render template call defined in the home route inside main.py
 const todos = {{ todos | tojson }};
 console.log(todos)
 
@@ -86,12 +87,10 @@ function openPanel(body) {
     body.classList.add("edit-mode");
 
     body.innerHTML = 
-    `<div class="d-flex flex-column justify-content-center align-items-center h-100">
-      <div class="btn-group btn-group-sm w-75" role="group">
-        <button class="btn btn-outline-primary">Edit</button>
-        <button class="btn btn-outline-success">Done</button>
-        <button class="btn btn-outline-danger">Delete</button>
-      </div>
+    `<div class="d-grid gap-2 col-10 mx-auto">
+        <button class="btn btn-outline-primary">Edit status</button>
+        <button class="btn btn-outline-success">Mark as done</button>
+        <button class="btn btn-outline-danger">Delete Todo</button>
       <button class="btn btn-link mt-2 cancel-edit">Cancel</button>
     </div>`;
 };

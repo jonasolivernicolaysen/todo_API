@@ -1,30 +1,10 @@
-from flask import Flask, render_template, redirect, url_for, request, session, jsonify, make_response
+from flask import render_template, redirect, url_for, request, session, make_response
 from db import Todo, User, db
 from datetime import datetime
-from typing import Optional
-from sqlalchemy import and_, func
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, set_access_cookies, unset_access_cookies
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, set_access_cookies, unset_access_cookies
+from app_setup import app
 
 
-# app setup
-app = Flask(__name__)
-app.config["SECRET_KEY"] = "secretkey"
-app.config["JWT_SECRET_KEY"] = "jwtsecretkey"
-app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
-app.config["JWT_COOKIE_CSRF_PROTECT"] = False
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///todo.db"
-
-# initialize jwt authentication
-jwt = JWTManager(app)
-
-# initialize sqlalchemy
-db.init_app(app)
-
-# create new database every start, this is only for testing purposes
-""" with app.app_context():
-    db.drop_all()
-    db.create_all()
- """
 # routes
 @app.route("/", methods=["GET", "POST"])
 def authenticate():

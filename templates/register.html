@@ -8,31 +8,44 @@
 <div class="alert alert-danger text-center mb-3" role="alert" id="error">{{ error }}</div>
 {%endif%}
 
-<div id="register_form" name="register_form">
-    <form action="/register" method="post">
-        <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" class="form-control" id="username" name="username" placeholder="Write your username here">
-        </div>
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" class="form-control" id="password" name="password" placeholder="Write your password here">
-        </div>
-        <div class="form-group">
-            <label for="password_check">Repeat password</label>
-            <input type="password" class="form-control" id="password_check" name="password_check" placeholder="Repeat password">
-        </div>
+<div class="d-flex justify-content-center align-items-center vh-100 bg-light">
+  <div class="card shadow-sm p-4" style="width: 360px; border-radius: 12px;">
+    <h3 class="text-center mb-4 text-primary fw-semibold">Register</h3>
+
+    <form action="/register" method="post" id="register_form" name="register_form">
+      <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
+        <input type="text" class="form-control" id="username" name="username" placeholder="Write your username here" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" class="form-control" id="password" name="password" placeholder="Write your password here" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="password_check" class="form-label">Repeat password</label>
+        <input type="password" class="form-control" id="password_check" name="password_check" placeholder="Repeat password" required>
+      </div>
+
+      <div class="d-grid mb-3">
         <button type="submit" class="btn btn-primary">Register</button>
+      </div>
     </form>
 
-    <div class="register_login">
-        <span class="text">Already have an account? <a id="register_login_link" class="text signup-link">Log in</a></span>
+    <div class="text-center mt-2">
+      <small class="text-muted">
+        Already have an account?
+        <a id="register_login_link" class="signup-link text-primary fw-semibold" href="#">Log in</a>
+      </small>
     </div>
+  </div>
 </div>
+
 
 <script>
     document.getElementById("register_login_link").onclick = function() {
-    location.href = "http://127.0.0.1:5000/login"
+    location.href = "http://127.0.0.1:5000/"
 };
 </script>
 {%endblock%}

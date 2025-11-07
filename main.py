@@ -7,8 +7,25 @@ from app_setup import app
 
 # routes
 @app.route("/", methods=["GET", "POST"])
-def authenticate():
-    return render_template("authenticate.html")
+def login():
+    if request.method == "GET":
+        return render_template("login.html")
+    
+    username = request.form.get("username")
+    password = request.form.get("password")
+
+    session["username"] = username
+
+    # check if user is in the db, if not give an error
+    user = User.query.filter_by(username=username, password=password).first()
+    if not user:
+        return render_template("login.html", error="User not found")
+    
+    access_token = create_access_token(identity=str(user.id))
+    resp = make_response(redirect(url_for("home")))
+    set_access_cookies(resp, access_token) # places jwt cookie in users browser
+    return resp
+ 
 
 
 @app.route("/home", methods=["GET", "POST"])
@@ -46,27 +63,6 @@ def register():
     db.session.commit()
     return redirect(url_for("login"))
 
-
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    if request.method == "GET":
-        return render_template("login.html")
-    
-    username = request.form.get("username")
-    password = request.form.get("password")
-
-    session["username"] = username
-
-    # check if user is in the db, if not give an error
-    user = User.query.filter_by(username=username, password=password).first()
-    if not user:
-        return render_template("login.html", error="User not found")
-    
-    access_token = create_access_token(identity=str(user.id))
-    resp = make_response(redirect(url_for("home")))
-    set_access_cookies(resp, access_token) # places jwt cookie in users browser
-    return resp
- 
 
 @app.route("/logout", methods=["GET", "POST"])
 def logout():

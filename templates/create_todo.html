@@ -9,22 +9,33 @@
 {%if error%}
 <div class="alert alert-danger text-center mb-3" role="alert" id="error">{{ error }}</div>
 {%endif%}
+<div class="d-flex justify-content-center align-items-center vh-100 bg-light">
+  <div class="card shadow-sm p-4" style="width: 400px; border-radius: 12px;">
+    <h3 class="text-center mb-4 text-primary fw-semibold">Create a New Todo</h3>
 
-<div id="todo_form" name="todo_form">
-    <form action="/create_todo" method="post">
-        <div class="form-group">
-            <label for="name">Name</label>
-            <input type="text" class="form-control" id="form_name" name="form_name" placeholder="Write the name of your todo here">
-        </div>
-        <div class="form-group">
-            <label for="description">Description</label>
-            <input type="text" class="form-control" id="form_description" name="form_description" placeholder="Write your description here">
-        </div>
-        <div class="form-group">
-            <label for="due_date">Due date</label>
-            <input type="date" class="form-control" id="form_due_date" name="form_due_date" placeholder="Write your due date here">
-        </div>
+    <form action="/create_todo" method="post" id="todo_form" name="todo_form">
+      <div class="mb-3">
+        <label for="form_name" class="form-label">Name</label>
+        <input type="text" class="form-control" id="form_name" name="form_name" placeholder="Write the name of your todo here" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="form_description" class="form-label">Description</label>
+        <textarea 
+            class="form-control" id="form_description" name="form_description" placeholder="Write your description here" rows="3">
+        </textarea>
+      </div>
+
+      <div class="mb-3">
+        <label for="form_due_date" class="form-label">Due Date</label>
+        <input type="date" class="form-control" id="form_due_date" name="form_due_date">
+      </div>
+
+      <div class="d-grid">
         <button type="submit" class="btn btn-primary">Submit</button>
+      </div>
     </form>
+  </div>
 </div>
+
 {%endblock%}

@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, request, session, make_response
+from flask import render_template, redirect, url_for, request, session, make_response, jsonify, abort
 from db import Todo, User, db
 from datetime import datetime
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, set_access_cookies, unset_access_cookies
@@ -99,3 +99,38 @@ def create_todo():
     db.session.add(new_todo)
     db.session.commit()
     return redirect(url_for("home"))
+
+
+# flask routes for handling todo panel operations
+@app.route("/todos/<int:todo_id>", methods=["PATCH"])
+@jwt_required()
+def update_todo(todo_id):
+    todo = Todo.query.get_or_404(todo_id)
+
+    if not str(todo.user_id) == str(get_jwt_identity()):
+        abort(404)
+    
+    data = request.get_json() or {}
+
+    # update fields
+    for field in ("name", "description", "due_date", "status"):
+        if field in data:
+            # equivalent to todo.field = data[field]
+            setattr(todo, field, data[field])
+    
+    db.session.commit()
+    return jsonify(todo=todo.to_dict())
+    
+
+@app.route("/todos/<int:todo_id>", methods=["DELETE"])
+@jwt_required()
+def delete_todo(todo_id):
+    todo = Todo.query.get_or_404(todo_id)
+    if not str(todo.user_id) == str(get_jwt_identity()):
+        abort(404)
+    
+    db.session.delete(todo)
+    db.session.commit()
+    return jsonify(ok=True)
+
+print(app.url_map)

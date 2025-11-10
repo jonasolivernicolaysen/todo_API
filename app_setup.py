@@ -7,6 +7,8 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = "secretkey"
 app.config["JWT_SECRET_KEY"] = "jwtsecretkey"
 app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
+app.config["JWT_COOKIE_SECURE"] = False
+app.config["JWT_COOKIE_SAMESITE"] = "Lax"
 app.config["JWT_COOKIE_CSRF_PROTECT"] = False
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///todo.db"
 

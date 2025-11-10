@@ -35,16 +35,10 @@
 {%endif%}
 
 <script>
-
 function formatDate(dateStr) {
-  if (!dateStr || dateStr.trim() === "") {
-    return "Unspecified";
-  }
+  if (!dateStr || dateStr.trim() === "") { return "Unspecified"; }
   const date = new Date(dateStr);
-
-  if (isNaN(date.getTime())) {
-    return dateStr; 
-  }
+  if (isNaN(date.getTime())) { return dateStr; }
   // returns the dates in dd/mm/yy format
   return date.toLocaleDateString("en-GB");
 }
@@ -56,7 +50,7 @@ console.log(todos)
 const todoList = document.getElementById("todos_div");
 todos.forEach(todo => {
     var content =
-            `<div class="card shadow-sm mb-3 border-0" style="height: 200px; width: 200px;">
+            `<div class="card shadow-sm mb-3 border-0" data-id="${todo.id}" style="height: 200px; width: 200px;">
             <div class="card-body d-flex flex-column py-2">
                 <h6 class="card-title mb-1 fw-semibold text-truncate text-center p-2">${todo.name}</h6>
                 <p class="card-text text-muted small mb-2 flex-grow-1 overflow-auto"
@@ -72,6 +66,17 @@ todos.forEach(todo => {
     todoList.innerHTML += content;
 });
 
+todoList.addEventListener("click", (event) => {
+  const card = event.target.closest(".card");
+  if (!card) return;
+
+  const body = card.querySelector(".card-body");
+  if (body.classList.contains("edit-mode")) return;
+
+  event.stopPropagation(); // prevents card from closing immediately
+  closeOpenPanels(body);
+  openPanel(body);
+});
 
 document.getElementById("create_todo_button").onclick = function() {
     location.href = "http://127.0.0.1:5000/create_todo"
@@ -98,39 +103,25 @@ function openPanel(body) {
 
     body.innerHTML = 
     `<div class="d-grid gap-2 col-10 mx-auto">
-        <button class="btn btn-outline-primary">Edit status</button>
-        <button class="btn btn-outline-success">Mark as done</button>
-        <button class="btn btn-outline-danger">Delete Todo</button>
+        <button class="btn btn-outline-primary action-edit">Edit status</button>
+        <button class="btn btn-outline-success action-mark-as-done">Mark as done</button>
+        <button class="btn btn-outline-danger action-delete">Delete Todo</button>
       <button class="btn btn-link mt-2 cancel-edit">Cancel</button>
     </div>`;
 };
 
-todoList.addEventListener("click", (event) => {
-    const card = event.target.closest(".card");
-    if (!card) return;
-
-    // let the cancel button handler close the panel instead
-    if (event.target.classList.contains("cancel-edit")) return;
-
-    // stops card from immediately getting reverted to original again
-    event.stopPropagation();
-
-    const body = card.querySelector(".card-body");
-    if (body.classList.contains("edit-mode")) return;
-
-    closeOpenPanels(body);
-    openPanel(body);
-});
-
-// eventlistener for the cancel-edit button inside the edit-card panel
+// eventlistener for the cancel-edit button inside the edit-card panel 1
 document.addEventListener("click", (event) => {
     if (event.target.classList.contains("cancel-edit")) {
         event.stopPropagation()
         
         // resets the body to the original content
-        const body = event.target.closest(".card-body");
-        body.innerHTML = body.dataset.original;
+        const card = event.target.closest(".card");
+        if (!card) return;
+        const body = card.querySelector(".card-body");
+        if (!body || !body.dataset.original) return;
 
+        body.innerHTML = body.dataset.original;
         body.classList.remove("edit-mode");
         delete body.dataset.original;
     };
@@ -138,15 +129,124 @@ document.addEventListener("click", (event) => {
 
 // when clicking outside a card it closes the currently open card
 // this only works combined while stoppropagation() is in todolist.addeventlistener   
-document.addEventListener("click", (event) => {
-    if (event.target.classList.contains(".card-body")) return;
-    document.querySelectorAll("#todos_div .card-body").forEach(body => {
-        if (body.dataset.original) {
+document.addEventListener("click", (e) => {
+  // Ignore clicks that happen inside a card (including buttons, text, etc.)
+  if (e.target.closest(".card")) return;
+
+  closeOpenPanels();  // Reverts any card currently in edit mode
+});
+
+
+async function api(path, options = {}) {
+  const res = await fetch(path, {
+    method: options.method || "GET",
+    headers: { "Content-Type": "application/json" },
+    body: options.body || null,
+    credentials: "include",
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json().catch(() => ({}));
+};
+
+
+document.addEventListener("click", async (event) => {
+    // delete
+    if (event.target.classList.contains("action-delete")) {
+        event.stopImmediatePropagation();
+        const card = event.target.closest(".card");
+        if (!card) return;
+        const id = card.dataset.id;
+        try {
+            await api(`/todos/${id}`, {method: "DELETE"});
+            card.remove();
+        } catch (err) { console.log(err); }
+    };
+
+    // done
+    if (event.target.classList.contains("action-mark-as-done")) {
+        event.stopImmediatePropagation();
+        const card = event.target.closest(".card");
+        if (!card) return;
+        const id = card.dataset.id;
+        try {
+            const { todo } = await api(`/todos/${id}`, {
+                method: "PATCH",
+                body: JSON.stringify({ status: "done" })
+            });
+
+            // update badge in current card
+            const body = card.querySelector(".card-body");
+
+            if (body.dataset.original) {
+                body.innerHTML = body.dataset.original;
+                delete body.dataset.original;
+                body.classList.remove("edit-mode");
+            }
+            
+            const badge = body.querySelector(".badge");
+            if (badge) {
+                badge.textContent = todo.status || "done";
+                console.log(badge)
+                badge.classList.remove("bg-primary");
+                badge.classList.add("bg-success");
+            } else {
+                console.log("No badge element found for card:", card);
+            }
+        } catch (err) { console.log(err); }  
+    };
+
+    // edit
+    if (event.target.classList.contains("action-edit")) {
+        event.stopImmediatePropagation();
+        const card = event.target.closest(".card");
+        if (!card) return;
+        const body = card.querySelector(".card-body");
+
+        const id = card.dataset.id;
+        const name = body.querySelector("h6")?.textContent?.trim() || "";
+        const desc = body.querySelector("p")?.textContent?.trim() || "";
+        body.classList.add("edit-mode");
+        body.innerHTML = `
+        <div class="w-100">
+        <div class="mb-2">
+          <input class="form-control form-control-sm" id="edit-name" value="${name}">
+        </div>
+        <div class="mb-2">
+          <textarea class="form-control form-control-sm" id="edit-desc" rows="3">${desc}</textarea>
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-primary btn-sm save-edit">Save</button>
+          <button class="btn btn-link btn-sm cancel-edit">Cancel</button>
+        </div>
+        </div>
+    `};
+
+    // save
+    if (event.target.classList.contains("save-edit")) {
+        event.stopImmediatePropagation();
+        const card = event.target.closest(".card");
+        if (!card) return;
+        const body = card.querySelector(".card-body")
+        const id = card.dataset.id;
+        const newName = body.querySelector("#edit-name").value.trim();
+        const newDesc = body.querySelector("#edit-desc").value.trim();
+
+        try {
+            const { todo } = await api(`/todos/${id}`, {
+                method: "PATCH",
+                body: JSON.stringify({ name: newName, description: newDesc })
+            });
+
             body.innerHTML = body.dataset.original;
+            body.classList.remove("edit-mode");
             delete body.dataset.original;
-        }
-        body.classList.remove("edit-mode");
-    });
+
+            card.querySelector(".card-title").textContent = todo.name;
+            console.log(card)
+            console.log(event.target)
+            card.querySelector(".card-text").textContent = todo.description || "";            
+        } catch (err) { console.log(err); }
+    };
 });
 </script>
 {%endblock%}

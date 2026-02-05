@@ -1,4 +1,4 @@
-# Flask Todo App (JWT Auth)
+# Flask Todo App 
 
 A simple Flask-based Todo application with user authentication using JWT stored in cookies, SQLAlchemy for persistence, and basic CRUD functionality for todos.
 

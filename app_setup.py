@@ -10,7 +10,7 @@ app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
 app.config["JWT_COOKIE_SECURE"] = False
 app.config["JWT_COOKIE_SAMESITE"] = "Lax"
 app.config["JWT_COOKIE_CSRF_PROTECT"] = False
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///todo.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:////app/data/todo.db"
 
 # initialize jwt authentication
 jwt = JWTManager(app)
@@ -18,8 +18,12 @@ jwt = JWTManager(app)
 # initialize sqlalchemy
 db.init_app(app)
 
+from sqlalchemy import text
+
+with app.app_context():
+    print("Database URI:", app.config["SQLALCHEMY_DATABASE_URI"])
+    print("Engine URL:", db.engine.url)
+
 # create new database every start, this is only for testing purposes
-""" with app.app_context():
-    db.drop_all()
+with app.app_context():
     db.create_all()
- """

@@ -30,9 +30,8 @@
 </div>
 
 
-{%if todos%}
 <div id="todos_div" name="todos_div" class="todos_div d-flex flex-wrap gap-3 pt-4"></div>
-{%endif%}
+
 
 <script>
 function formatDate(dateStr) {
@@ -79,11 +78,11 @@ todoList.addEventListener("click", (event) => {
 });
 
 document.getElementById("create_todo_button").onclick = function() {
-    location.href = "http://127.0.0.1:5000/create_todo"
+    location.href = "/create_todo"
 };
 
 document.getElementById("logout_button").onclick = function() {
-    location.href = "http://127.0.0.1:5000/logout"
+    location.href = "/logout"
 };
 
 function closeOpenPanels(exceptBody = null) {

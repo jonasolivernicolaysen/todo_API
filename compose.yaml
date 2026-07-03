@@ -1,0 +1,16 @@
+services:
+  todo-api:
+    container_name: todo-api-container
+
+    build: .
+
+    ports:
+      - "5000:5000"
+
+    volumes:
+      - todo-data:/app/data
+
+    restart: unless-stopped
+  
+volumes: 
+  todo-data:

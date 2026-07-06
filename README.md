@@ -1,6 +1,6 @@
-# Flask Todo App 
+# TaskFlow
 
-A Flask-based Todo application with user authentication using JWT stored in cookies, SQLAlchemy for persistence, and basic CRUD functionality for todos.
+A Flask-based Task Flow application with user authentication using JWT stored in cookies, SQLAlchemy for persistence, and basic CRUD functionality for tasks.
 
 
 ## Features
@@ -11,16 +11,16 @@ JWT authentication using Flask-JWT-Extended
 
 JWT stored securely in HTTP cookies
 
-User-specific todo lists
+User-specific task lists
 
-Create, update, and delete todos
+Create, update, and delete task
 
 SQLite database using SQLAlchemy ORM
 
 Server-side rendered templates (Jinja2)
 
 ## Creating a user
-Before accessing the todo application, all users must log in.
+Before accessing the task application, all users must log in.
 If you don't have a user, you can just click register.
 
 <p align="center">
@@ -36,13 +36,13 @@ After logging in, you will be met with a blank page containing only a header.
 
 ---
 
-## Accessing the todos
+## Accessing the tasks
 
-If you click the button "Create todo" you will get to the todo creation page, which will pop up in your homepage until you delete them.
+If you click the button "Create task" you will get to the task creation page, which will pop up in your homepage until you delete them.
 
 <p align="center">
-  <img src="assets/create_todo.png" width="380">
-  <img src="assets/todos.png" width="380">
+  <img src="assets/create_task.png" width="380">
+  <img src="assets/tasks.png" width="380">
 </p>
 
 ## Tech Stack
@@ -66,8 +66,8 @@ Docker
 ### Clone the repository:
 
 ```bash
-git clone https://github.com/jonasolivernicolaysen/todo_API.git
-cd todo_API
+git clone https://github.com/jonasolivernicolaysen/TaskFlow.git
+cd TaskFlow
 ```
 ### Build and start the application
 ```bash

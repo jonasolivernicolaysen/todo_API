@@ -1,6 +1,6 @@
 services:
-  todo-api:
-    container_name: todo-api-container
+  taskflow:
+    container_name: taskflow
 
     build: .
 

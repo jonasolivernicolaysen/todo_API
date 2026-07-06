@@ -16,7 +16,7 @@ class User(db.Model):
         }
 
 
-class Todo(db.Model):
+class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     name = db.Column(db.String(40), nullable=False)

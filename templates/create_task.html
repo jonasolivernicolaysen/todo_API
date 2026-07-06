@@ -1,6 +1,6 @@
 {%extends "base.html"%}
 
-{%block title%} Create todo {%endblock%}
+{%block title%} Create task {%endblock%}
 
 
 
@@ -11,12 +11,12 @@
 {%endif%}
 <div class="d-flex justify-content-center align-items-center vh-100 bg-light">
   <div class="card shadow-sm p-4" style="width: 400px; border-radius: 12px;">
-    <h3 class="text-center mb-4 text-primary fw-semibold">Create a New Todo</h3>
+    <h3 class="text-center mb-4 text-primary fw-semibold">Create a new Task</h3>
 
-    <form action="/create_todo" method="post" id="todo_form" name="todo_form">
+    <form action="/create_task" method="post" id="task_form" name="task_form">
       <div class="mb-3">
         <label for="form_name" class="form-label">Name</label>
-        <input type="text" class="form-control" id="form_name" name="form_name" placeholder="Write the name of your todo here" required>
+        <input type="text" class="form-control" id="form_name" name="form_name" placeholder="Write the name of your task here" required>
       </div>
 
       <div class="mb-3">

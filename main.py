@@ -1,5 +1,5 @@
 from flask import render_template, redirect, url_for, request, session, make_response, jsonify, abort
-from db import Todo, User, db
+from db import Task, User, db
 from datetime import datetime
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, set_access_cookies, unset_access_cookies
 from app_setup import app
@@ -32,11 +32,11 @@ def login():
 @jwt_required()
 def home():
     username = session.get("username")
-    # only show todos of the current user
+    # only show tasks of the current user
     current_user = get_jwt_identity() # gets user_id from JWT
-    todos = Todo.query.filter_by(user_id=current_user) 
-    jsonified_todos = [todo.to_dict() for todo in todos]
-    return render_template("home.html", todos=jsonified_todos, username=username)
+    tasks = Task.query.filter_by(user_id=current_user) 
+    jsonified_todos = [task.to_dict() for task in tasks]
+    return render_template("home.html", tasks=jsonified_todos, username=username)
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -71,11 +71,11 @@ def logout():
     return resp
 
 
-@app.route("/create_todo", methods=["GET", "POST"])
+@app.route("/create_task", methods=["GET", "POST"])
 @jwt_required()
-def create_todo():
+def create_task():
     if request.method == "GET":
-        return render_template("create_todo.html")
+        return render_template("create_task.html")
 
     current_user_id = get_jwt_identity()
 
@@ -85,29 +85,29 @@ def create_todo():
     created_at = datetime.now().strftime("%Y-%m-%d")
 
     if not name:
-        return render_template("create_todo.html", error="Name is required")
+        return render_template("create_task.html", error="Name is required")
     
     # now status is always todo, must add logic to actually change this
-    new_todo = Todo()
-    new_todo.user_id = current_user_id
-    new_todo.name = name
-    new_todo.description = description or ""
-    new_todo.created_at = created_at
-    new_todo.due_date = due_date or ""
-    new_todo.status = "todo"
+    new_task = Task()
+    new_task.user_id = current_user_id
+    new_task.name = name
+    new_task.description = description or ""
+    new_task.created_at = created_at
+    new_task.due_date = due_date or ""
+    new_task.status = "todo"
     
-    db.session.add(new_todo)
+    db.session.add(new_task)
     db.session.commit()
     return redirect(url_for("home"))
 
 
 # flask routes for handling todo panel operations
-@app.route("/todos/<int:todo_id>", methods=["PATCH"])
+@app.route("/tasks/<int:task_id>", methods=["PATCH"])
 @jwt_required()
-def update_todo(todo_id):
-    todo = Todo.query.get_or_404(todo_id)
+def update_task(task_id):
+    task = Task.query.get_or_404(task_id)
 
-    if not str(todo.user_id) == str(get_jwt_identity()):
+    if not str(task.user_id) == str(get_jwt_identity()):
         abort(404)
     
     data = request.get_json() or {}
@@ -115,21 +115,21 @@ def update_todo(todo_id):
     # update fields
     for field in ("name", "description", "due_date", "status"):
         if field in data:
-            # equivalent to todo.field = data[field]
-            setattr(todo, field, data[field])
+            # equivalent to task.field = data[field]
+            setattr(task, field, data[field])
     
     db.session.commit()
-    return jsonify(todo=todo.to_dict())
+    return jsonify(task=task.to_dict())
     
 
-@app.route("/todos/<int:todo_id>", methods=["DELETE"])
+@app.route("/tasks/<int:task_id>", methods=["DELETE"])
 @jwt_required()
-def delete_todo(todo_id):
-    todo = Todo.query.get_or_404(todo_id)
-    if not str(todo.user_id) == str(get_jwt_identity()):
+def delete_task(task_id):
+    task = Task.query.get_or_404(task_id)
+    if not str(task.user_id) == str(get_jwt_identity()):
         abort(404)
     
-    db.session.delete(todo)
+    db.session.delete(task)
     db.session.commit()
     return jsonify(ok=True)
 

@@ -1,6 +1,8 @@
 from flask import Flask
 from db import db
 from flask_jwt_extended import JWTManager
+import os
+from pathlib import Path
 
 # app setup
 app = Flask(__name__)
@@ -10,7 +12,14 @@ app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
 app.config["JWT_COOKIE_SECURE"] = False
 app.config["JWT_COOKIE_SAMESITE"] = "Lax"
 app.config["JWT_COOKIE_CSRF_PROTECT"] = False
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:////app/data/tasks.db"
+
+if os.path.exists("/.dockerenv"):
+    database_uri = "sqlite:////app/data/task.db"
+else:
+    db_file = (Path(__file__).parent / "data" / "task.db").resolve()
+    database_uri = f"sqlite:///{db_file.as_posix()}"
+
+app.config["SQLALCHEMY_DATABASE_URI"] = database_uri
 
 # initialize jwt authentication
 jwt = JWTManager(app)

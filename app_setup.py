@@ -29,10 +29,6 @@ db.init_app(app)
 
 from sqlalchemy import text
 
-with app.app_context():
-    print("Database URI:", app.config["SQLALCHEMY_DATABASE_URI"])
-    print("Engine URL:", db.engine.url)
-
 # create new database every start, this is only for testing purposes
 with app.app_context():
     db.create_all()

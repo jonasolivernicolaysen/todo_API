@@ -44,10 +44,16 @@ function formatDate(dateStr) {
 
 // loads tasks from the render template call defined in the home route inside
 const tasks = {{ tasks | tojson }};
-console.log(tasks)
+console.log(tasks) 
+console.log(typeof(tasks)) 
 
 const taskList = document.getElementById("tasks_div");
 tasks.forEach(task => {
+
+    const badgeClass = task.status == "Done"
+        ? "bg-success"
+        : "bg-primary";
+
     var content =
             `<div class="card shadow-sm mb-3 border-0" data-id="${task.id}" style="height: 200px; width: 200px;">
             <div class="card-body d-flex flex-column py-2">
@@ -58,7 +64,7 @@ tasks.forEach(task => {
                 </p>
                 <div class="mt-auto d-flex justify-content-between align-items-center">
                 <small class="text-secondary">Due: ${formatDate(task.due_date)}</small>
-                <span class="badge bg-primary">${task.status || "task"}</span>
+                <span class="badge ${badgeClass}">${task.status || "task"}</span>
                 </div>
             </div>
             </div>`;
@@ -170,7 +176,7 @@ document.addEventListener("click", async (event) => {
         try {
             const { task } = await api(`/tasks/${id}`, {
                 method: "PATCH",
-                body: JSON.stringify({ status: "done" })
+                body: JSON.stringify({ status: "Done" })
             });
 
             // update badge in current card
@@ -184,7 +190,7 @@ document.addEventListener("click", async (event) => {
             
             const badge = body.querySelector(".badge");
             if (badge) {
-                badge.textContent = task.status || "done";
+                badge.textContent = task.status || "Done";
                 console.log(badge)
                 badge.classList.remove("bg-primary");
                 badge.classList.add("bg-success");

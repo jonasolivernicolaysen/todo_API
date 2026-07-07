@@ -5,8 +5,6 @@ password = b"password"
 salt = bcrypt.gensalt()
 
 hashed = bcrypt.hashpw(password, salt=salt)
-print(salt)
-print(hashed)
 
 def hashPassword(password: str):
     password_as_bytes = password.encode("utf-8")

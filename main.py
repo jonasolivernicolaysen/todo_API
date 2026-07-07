@@ -4,6 +4,7 @@ from datetime import datetime
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, set_access_cookies, unset_access_cookies
 from app_setup import app
 from AuthService import hashPassword, checkPassword
+from sqlalchemy import case
 
 
 # routes
@@ -43,7 +44,12 @@ def home():
     username = session.get("username")
     # only show tasks of the current user
     current_user = get_jwt_identity() # gets user_id from JWT
-    tasks = Task.query.filter_by(user_id=current_user) 
+    tasks = Task.query.filter_by(user_id=current_user).order_by(
+        case(
+            (Task.status == "To Do", 0),
+            (Task.status == "Done", 1)
+        )
+    )
     jsonified_tasks = [task.to_dict() for task in tasks]
     return render_template("home.html", tasks=jsonified_tasks, username=username)
 

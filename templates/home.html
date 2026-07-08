@@ -44,13 +44,10 @@ function formatDate(dateStr) {
 
 // loads tasks from the render template call defined in the home route inside
 const tasks = {{ tasks | tojson }};
-console.log(tasks) 
-console.log(typeof(tasks)) 
 
 const taskList = document.getElementById("tasks_div");
 
 tasks.forEach(task => {
-
     const badgeClass = task.status == "Done"
         ? "bg-success"
         : "bg-primary";
@@ -73,22 +70,28 @@ tasks.forEach(task => {
 });
 
 taskList.addEventListener("click", (event) => {
-  if (event.target.closest("button")) {
-    return;
-  }
+    // stop panel from closing if user clicks button
+    if (event.target.closest("button")) {
+        return;
+    }
 
-  const card = event.target.closest(".card");
-  if (!card) return;
+    // stop edit panel from closing if user clicks input
+    if (event.target.closest("input") || event.target.closest("textarea")) {
+        return;
+    }
 
-  const body = card.querySelector(".card-body");
-  if (body.classList.contains("edit-mode")) {
+    const card = event.target.closest(".card");
+    if (!card) return;
+
+    const body = card.querySelector(".card-body");
+    if (body.classList.contains("edit-mode")) {
     closeOpenPanels();
     return;
-  }
+    }
 
-  event.stopPropagation(); // prevents card from closing immediately
-  closeOpenPanels(body);
-  openPanel(body);
+    event.stopPropagation(); // prevents card from closing immediately
+    closeOpenPanels(body);
+    openPanel(body);
 });
 
 document.getElementById("create_task_button").onclick = function() {
@@ -206,15 +209,15 @@ document.addEventListener("click", async (event) => {
         body.innerHTML = `
         <div class="w-100">
             <div class="mb-2">
-                <input class="form-control form-control-sm" id="edit-name" value="${name}">
+                <input class="form-control form-control-sm" id="edit-name" value="${name}" placeholder="Name">
             </div>
             
             <div class="mb-2">
-                <textarea class="form-control form-control-sm" id="edit-desc" rows="3">${desc}</textarea>
+                <textarea class="form-control form-control-sm" id="edit-desc" rows="3" placeholder="Description">${desc}</textarea>
             </div>
 
             <div class="d-flex gap-2">
-            <   button class="btn btn-primary btn-sm save-edit">Save</button>
+            <button class="btn btn-primary btn-sm save-edit">Save</button>
             </div>
         </div>`
     };

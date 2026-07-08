@@ -71,12 +71,7 @@ tasks.forEach(task => {
 
 taskList.addEventListener("click", (event) => {
     // stop panel from closing if user clicks button
-    if (event.target.closest("button")) {
-        return;
-    }
-
-    // stop edit panel from closing if user clicks input
-    if (event.target.closest("input") || event.target.closest("textarea")) {
+    if (event.target.closest("button") || event.target.closest("input") || event.target.closest("textarea")) {
         return;
     }
 

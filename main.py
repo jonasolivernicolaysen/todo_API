@@ -5,6 +5,7 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 from app_setup import app
 from AuthService import hashPassword, checkPassword
 from sqlalchemy import case
+from statuses import Status
 
 
 # routes
@@ -46,12 +47,13 @@ def home():
     current_user = get_jwt_identity() # gets user_id from JWT
     tasks = Task.query.filter_by(user_id=current_user).order_by(
         case(
-            (Task.status == "To Do", 0),
-            (Task.status == "Done", 1)
+            (Task.status == Status.TODO.value, 0),
+            (Task.status == Status.DOING.value, 1),
+            (Task.status == Status.DONE.value, 2)
         )
     )
     jsonified_tasks = [task.to_dict() for task in tasks]
-    return render_template("home.html", tasks=jsonified_tasks, username=username)
+    return render_template("home.html", username=username, Status=Status)
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -112,7 +114,7 @@ def create_task():
     new_task.description = description or ""
     new_task.created_at = created_at
     new_task.due_date = due_date or ""
-    new_task.status = "To Do"
+    new_task.status = Status.TODO.value
     
     db.session.add(new_task)
     db.session.commit()
@@ -133,7 +135,6 @@ def update_task(task_id):
     # update fields
     for field in ("name", "description", "due_date", "status"):
         if field in data:
-            # equivalent to task.field = data[field]
             setattr(task, field, data[field])
     
     db.session.commit()
@@ -150,6 +151,21 @@ def delete_task(task_id):
     db.session.delete(task)
     db.session.commit()
     return jsonify(ok=True)
+
+@app.route("/tasks", methods=["GET"])
+@jwt_required()
+def get_tasks():
+    # only show tasks of the current user
+    current_user = get_jwt_identity() # gets user_id from JWT
+    tasks = Task.query.filter_by(user_id=current_user).order_by(
+        case(
+            (Task.status == Status.TODO.value, 0),
+            (Task.status == Status.DOING.value, 1),
+            (Task.status == Status.DONE.value, 2)
+        )
+    )
+    jsonified_tasks = [task.to_dict() for task in tasks]
+    return jsonify(tasks=jsonified_tasks)
 
 print(app.url_map)
 if __name__ == "__main__":

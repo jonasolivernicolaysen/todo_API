@@ -8,6 +8,7 @@
 {%if error%}
 <div class="alert alert-danger text-center mb-3" role="alert" id="error">{{ error }}</div>
 {%endif%}
+
 <div class="bg-light border-bottom shadow-sm py-3 px-4 d-flex justify-content-between align-items-center w-100">
   
   <!-- Left: Logged-in info -->
@@ -34,40 +35,57 @@
 
 
 <script>
+const Status = {
+    TODO: "{{ Status.TODO.value }}",
+    DOING: "{{ Status.DOING.value }}",
+    DONE: "{{ Status.DONE.value }}"
+};
+
 function formatDate(dateStr) {
   if (!dateStr || dateStr.trim() === "") { return "Unspecified"; }
   const date = new Date(dateStr);
   if (isNaN(date.getTime())) { return dateStr; }
   // returns the dates in dd/mm/yy format
   return date.toLocaleDateString("en-GB");
-}
+};
 
-// loads tasks from the render template call defined in the home route inside
-const tasks = {{ tasks | tojson }};
+// UPDATED: load tasks from the /get tasks endpoint in main.py
 
 const taskList = document.getElementById("tasks_div");
 
-tasks.forEach(task => {
-    const badgeClass = task.status == "Done"
-        ? "bg-success"
-        : "bg-primary";
+async function loadTasks() {    
+    const { tasks } = await api('/tasks');
+    const tasksAsArray = Array.from(tasks);
 
-    var content =
-            `<div class="card shadow-sm mb-3 border-0" data-id="${task.id}" style="height: 200px; width: 200px;">
-            <div class="card-body d-flex flex-column justify-content-center ">
-                <h6 class="card-title mb-1 fw-semibold text-truncate text-center p-2">${task.name}</h6>
-                <p class="card-text text-muted small mb-2 flex-grow-1 overflow-auto"
-                style="max-height: 100px; word-wrap: break-word;">
-                ${task.description}
-                </p>
-                <div class="mt-auto d-flex justify-content-between align-items-center">
-                <small class="text-secondary">Due: ${formatDate(task.due_date)}</small>
-                <span class="badge ${badgeClass}">${task.status || "task"}</span>
+    const badgeClasses = {
+        "To Do": "bg-primary",
+        "Doing": "bg-warning",
+        "Done": "bg-success",
+    };
+    taskList.replaceChildren();
+
+    tasksAsArray.forEach(task => {    
+        const badgeClass = badgeClasses[task.status];
+
+        var content =
+                `<div class="card shadow-sm mb-3 border-0" data-id="${task.id}" style="height: 200px; width: 200px;">
+                <div class="card-body d-flex flex-column justify-content-center ">
+                    <h6 class="card-title mb-1 fw-semibold text-truncate text-center p-2">${task.name}</h6>
+                    <p class="card-text text-muted small mb-2 flex-grow-1 overflow-auto"
+                    style="max-height: 100px; word-wrap: break-word;">
+                    ${task.description}
+                    </p>
+                    <div class="mt-auto d-flex justify-content-between align-items-center">
+                    <small class="text-secondary">Due: ${formatDate(task.due_date)}</small>
+                    <span class="badge ${badgeClass}">${task.status || "task"}</span>
+                    </div>
                 </div>
-            </div>
-            </div>`;
-    taskList.innerHTML += content;
-});
+                </div>`;
+        taskList.innerHTML += content;
+    });
+};
+
+loadTasks();
 
 taskList.addEventListener("click", (event) => {
     // stop panel from closing if user clicks button
@@ -114,9 +132,20 @@ function openPanel(body) {
 
     body.innerHTML = 
     `<div class="d-grid gap-2 col-10 mx-auto justify-content-center">
-        <button class="btn btn-outline-primary action-edit">Edit status</button>
-        <button class="btn btn-outline-success action-mark-as-done">Mark as done</button>
-        <button class="btn btn-outline-danger action-delete">Delete Task</button>
+        <button class="btn btn-primary action-edit">Edit Task</button>
+        <button class="btn btn-warning action-edit-status">Edit Status</button>
+        <button class="btn btn-danger action-delete">Delete Task</button>
+    </div>`;
+};
+
+function openStatusPanel(body) {
+    body.classList.add("edit-status-mode");
+
+    body.innerHTML = 
+    `<div class="d-grid gap-2 col-10 mx-auto justify-content-center">
+        <button class="btn btn-primary action-edit-status status-todo">To Do</button>
+        <button class="btn btn-warning action-edit-status status-doing">Doing</button>
+        <button class="btn btn-success action-edit-status status-done">Done</button>
     </div>`;
 };
 
@@ -157,38 +186,105 @@ document.addEventListener("click", async (event) => {
     };
 
     // done
-    if (event.target.classList.contains("action-mark-as-done")) {
+    if (event.target.classList.contains("action-edit-status")) {
         event.stopImmediatePropagation();
         const card = event.target.closest(".card");
         if (!card) return;
+
+        const body = card.querySelector(".card-body");
+        
         const id = card.dataset.id;
-        try {
-            const { task } = await api(`/tasks/${id}`, {
-                method: "PATCH",
-                body: JSON.stringify({ status: "Done" })
-            });
 
-            // update badge in current card
-            const body = card.querySelector(".card-body");
+        // to do
+        if (event.target.classList.contains("status-todo")) {
+            event.stopImmediatePropagation();
 
-            if (body.dataset.original) {
-                body.innerHTML = body.dataset.original;
-                delete body.dataset.original;
-                body.classList.remove("edit-mode");
-            }
-            
-            const badge = body.querySelector(".badge");
-            if (badge) {
-                badge.textContent = task.status || "Done";
-                console.log(badge)
-                badge.classList.remove("bg-primary");
-                badge.classList.add("bg-success");
-            } else {
-                console.log("No badge element found for card:", card);
-            }
-        } catch (err) { console.log(err); }  
-        window.location.reload();
+        const { task } = await api(`/tasks/${id}`, {
+            method: "PATCH",
+            body: JSON.stringify({ status: Status.TODO })
+        });
+
+        // update badge in current card
+        const body = card.querySelector(".card-body");
+
+        if (body.dataset.original) {
+            body.innerHTML = body.dataset.original;
+            delete body.dataset.original;
+            body.classList.remove("edit-mode");
+        }
+        
+        const badge = body.querySelector(".badge");
+        if (badge) {
+            badge.textContent = task.status || Status.TODO;
+            badge.classList.remove("bg-primary");
+            badge.classList.add("bg-success");
+        } else {
+            console.log("No badge element found for card:", card);
+        }
+        loadTasks();
+        };
+
+        // doing
+        if (event.target.classList.contains("status-doing")) {
+            event.stopImmediatePropagation();
+
+        const { task } = await api(`/tasks/${id}`, {
+            method: "PATCH",
+            body: JSON.stringify({ status: Status.DOING })
+        });
+
+        // update badge in current card
+        const body = card.querySelector(".card-body");
+
+        if (body.dataset.original) {
+            body.innerHTML = body.dataset.original;
+            delete body.dataset.original;
+            body.classList.remove("edit-mode");
+        }
+        
+        const badge = body.querySelector(".badge");
+        if (badge) {
+            badge.textContent = task.status || Status.DOING;
+            badge.classList.remove("bg-primary");
+            badge.classList.add("bg-success");
+        } else {
+            console.log("No badge element found for card:", card);
+        }
+        loadTasks();
+        };
+
+        // done
+        if (event.target.classList.contains("status-done")) {
+            event.stopImmediatePropagation();
+
+        const { task } = await api(`/tasks/${id}`, {
+            method: "PATCH",
+            body: JSON.stringify({ status: Status.DONE })
+        });
+
+        // update badge in current card
+        const body = card.querySelector(".card-body");
+
+        if (body.dataset.original) {
+            body.innerHTML = body.dataset.original;
+            delete body.dataset.original;
+            body.classList.remove("edit-mode");
+        }
+        
+        const badge = body.querySelector(".badge");
+        if (badge) {
+            badge.textContent = task.status || Status.DONE;
+            badge.classList.remove("bg-primary");
+            badge.classList.add("bg-success");
+        } else {
+            console.log("No badge element found for card:", card);
+        }
+        loadTasks();
+        };
+
+        openStatusPanel(body);    
     };
+    
 
     // edit
     if (event.target.classList.contains("action-edit")) {
@@ -238,8 +334,6 @@ document.addEventListener("click", async (event) => {
             delete body.dataset.original;
 
             card.querySelector(".card-title").textContent = task.name;
-            console.log(card)
-            console.log(event.target)
             card.querySelector(".card-text").textContent = task.description || "";            
         } catch (err) { console.log(err); }
     };

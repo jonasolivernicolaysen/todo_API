@@ -127,11 +127,14 @@ function closeOpenPanels(exceptBody = null) {
 }; 
 
 function openPanel(body) {
+    title = body.querySelector(".card-title").textContent.trim();
+    text = body.querySelector(".card-text").textContent.trim();
+
     body.dataset.original = body.innerHTML;
     body.classList.add("edit-mode");
 
     body.innerHTML = 
-    `<div class="d-grid gap-2 col-10 mx-auto justify-content-center">
+    `<div class="d-grid gap-2 col-10 mx-auto justify-content-center" data-title=${title} data-text=${text}>
         <button class="btn btn-primary action-edit">Edit Task</button>
         <button class="btn btn-warning action-edit-status">Edit Status</button>
         <button class="btn btn-danger action-delete">Delete Task</button>
@@ -140,13 +143,14 @@ function openPanel(body) {
 
 function openStatusPanel(body) {
     body.classList.add("edit-status-mode");
-
+    
     body.innerHTML = 
     `<div class="d-grid gap-2 col-10 mx-auto justify-content-center">
         <button class="btn btn-primary action-edit-status status-todo">To Do</button>
         <button class="btn btn-warning action-edit-status status-doing">Doing</button>
         <button class="btn btn-success action-edit-status status-done">Done</button>
     </div>`;
+    return { name, text }
 };
 
 
@@ -292,12 +296,16 @@ document.addEventListener("click", async (event) => {
         const card = event.target.closest(".card");
         if (!card) return;
         const body = card.querySelector(".card-body");
+        const targetDiv = body.firstElementChild;
+        
+        const nameInput = targetDiv.dataset.title;
+        const textInput = targetDiv.dataset.text;
 
         const id = card.dataset.id;
-        const name = body.querySelector("h6")?.textContent?.trim() || "";
-        const desc = body.querySelector("p")?.textContent?.trim() || "";
+        const name = body.querySelector("h6")?.textContent?.trim() || nameInput;
+        const desc = body.querySelector("p")?.textContent?.trim() || textInput;
         body.classList.add("edit-mode");
-        body.innerHTML = `
+        body.innerHTML = ` 
         <div class="w-100">
             <div class="mb-2">
                 <input class="form-control form-control-sm" id="edit-name" value="${name}" placeholder="Name">

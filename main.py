@@ -52,7 +52,6 @@ def home():
             (Task.status == Status.DONE.value, 2)
         )
     )
-    jsonified_tasks = [task.to_dict() for task in tasks]
     return render_template("home.html", username=username, Status=Status)
 
 

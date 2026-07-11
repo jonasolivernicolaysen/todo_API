@@ -19,7 +19,7 @@ class User(db.Model):
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    name = db.Column(db.String(40), nullable=False)
+    title = db.Column(db.String(40), nullable=False)
     description = db.Column(db.String(200))
     created_at = db.Column(db.String(40), nullable=False)
     due_date = db.Column(db.String(40))
@@ -28,7 +28,7 @@ class Task(db.Model):
     def to_dict(self):
         return {
             "id": self.id,
-            "name": self.name,
+            "title": self.title,
             "description": self.description,
             "created_at": self.created_at,
             "due_date": self.due_date,

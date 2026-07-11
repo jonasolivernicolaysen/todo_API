@@ -43,15 +43,6 @@ def login():
 @jwt_required()
 def home():
     username = session.get("username")
-    # only show tasks of the current user
-    current_user = get_jwt_identity() # gets user_id from JWT
-    tasks = Task.query.filter_by(user_id=current_user).order_by(
-        case(
-            (Task.status == Status.TODO.value, 0),
-            (Task.status == Status.DOING.value, 1),
-            (Task.status == Status.DONE.value, 2)
-        )
-    )
     return render_template("home.html", username=username, Status=Status)
 
 
@@ -99,17 +90,17 @@ def create_task():
 
     current_user_id = get_jwt_identity()
 
-    name = request.form.get("form_name") 
+    title = request.form.get("form_title") 
     description = request.form.get("form_description")
     due_date = request.form.get("form_due_date")
     created_at = datetime.now().strftime("%Y-%m-%d")
 
-    if not name:
-        return render_template("create_task.html", error="Name is required")
+    if not title:
+        return render_template("create_task.html", error="Title is required")
     
     new_task = Task()
     new_task.user_id = current_user_id
-    new_task.name = name
+    new_task.title = title
     new_task.description = description or ""
     new_task.created_at = created_at
     new_task.due_date = due_date or ""
@@ -132,7 +123,7 @@ def update_task(task_id):
     data = request.get_json() or {}
 
     # update fields
-    for field in ("name", "description", "due_date", "status"):
+    for field in ("title", "description", "due_date", "status"):
         if field in data:
             setattr(task, field, data[field])
     

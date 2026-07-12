@@ -38,7 +38,7 @@ After logging in, you will be met with a blank page containing only a header.
 
 ## Accessing the tasks
 
-If you click the button "Create task" you will get to the task creation page, which will pop up in your homepage until you delete them.
+If you click the button "Create task" you will get to the task creation page. After creation, tasks will pop up in your homepage until deleted. Tasks are ordered by status.
 
 <p align="center">
   <img src="assets/create_task.png" width="380">
